@@ -1961,6 +1961,7 @@ dependencies = [
  "structopt 0.3.21",
  "subscription-service",
  "tokio 1.0.1",
+ "tokio-stream",
 ]
 
 [[package]]
