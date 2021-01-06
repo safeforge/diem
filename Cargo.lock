@@ -6649,6 +6649,7 @@ dependencies = [
  "storage-service",
  "subscription-service",
  "tokio 1.0.1",
+ "tokio-stream",
  "transaction-builder",
  "vm-genesis",
 ]

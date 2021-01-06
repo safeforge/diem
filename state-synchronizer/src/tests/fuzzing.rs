@@ -81,8 +81,7 @@ pub fn test_state_sync_msg_fuzzer_impl(msg: StateSynchronizerMsg) {
         initial_state,
     )
     .expect("Unable to create sync coordinator");
-    let mut rt = tokio::runtime::Builder::new()
-        .basic_scheduler()
+    let rt = tokio::runtime::Builder::new_current_thread()
         .build()
         .unwrap();
     rt.block_on(async move {

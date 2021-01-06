@@ -29,7 +29,7 @@ use transaction_builder::{
 // TODO test for subscription with multiple subscribed configs once there are >1 on-chain configs
 #[test]
 fn test_on_chain_config_pub_sub() {
-    let mut rt = tokio::runtime::Runtime::new().unwrap();
+    let rt = tokio::runtime::Runtime::new().unwrap();
     // set up reconfig subscription
     let (subscription, mut reconfig_receiver) =
         ReconfigSubscription::subscribe_all("test", vec![VMPublishingOption::CONFIG_ID], vec![]);
