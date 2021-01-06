@@ -14,7 +14,7 @@ enum_dispatch = "0.3.5"
 futures = "0.3.8"
 pin-project = "1.0.3"
 thiserror = "1.0.23"
-tokio = { version = "0.2.22", features = ["macros", "rt-threaded", "time"] }
+tokio = { version = "1.0.1", features = ["macros", "time"] }
 
 diem-infallible = { path = "../infallible", version = "0.1.0" }
 diem-workspace-hack = { path = "../workspace-hack", version = "0.1.0" }
