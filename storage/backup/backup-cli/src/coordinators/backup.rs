@@ -291,7 +291,7 @@ impl BackupCoordinator {
             (initial_state, db_state_rx.clone()),
             move |(s, mut rx)| async move {
                 rx.changed().await.unwrap();
-                let db_state = (*rx.borrow()).clone();
+                let db_state = *rx.borrow();
                 if let Some(db_state) = db_state {
                     let next_state = worker(self, s, db_state).await.unwrap_or_else(|e| {
                         warn!("backup failed: {}. Keep trying with state {:?}.", e, s);
