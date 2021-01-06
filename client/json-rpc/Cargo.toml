@@ -28,7 +28,7 @@ diem-workspace-hack = { path = "../../common/workspace-hack", version = "0.1.0" 
 
 
 [dev-dependencies]
-warp = "0.2.5"
+warp = { git = "https://github.com/bmwill/warp.git", rev = "40e1de82882f7e0c8b73d666d273315d961384f6" }
 diem-config = { path = "../../config", version = "0.1.0" }
 
 
