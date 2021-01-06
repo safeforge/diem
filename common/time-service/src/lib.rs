@@ -7,6 +7,7 @@
 
 use enum_dispatch::enum_dispatch;
 use futures::future::Future;
+use pin_project::pin_project;
 use std::{
     fmt::Debug,
     pin::Pin,
@@ -134,32 +135,62 @@ pub trait TimeServiceTrait: Send + Sync + Clone + Debug {
 /// simulated, depending on the parent [`TimeService`]).
 ///
 /// `Sleep` is modeled after [`tokio::time::Delay`].
-#[enum_dispatch(SleepTrait)]
+#[pin_project(project = SleepProject)]
 #[derive(Debug)]
 pub enum Sleep {
-    TokioSleep,
+    TokioSleep(#[pin] TokioSleep),
 
     #[cfg(any(test, feature = "fuzzing", feature = "testing"))]
-    MockSleep,
+    MockSleep(MockSleep),
+}
+
+impl From<TokioSleep> for Sleep {
+    fn from(sleep: TokioSleep) -> Self {
+        Sleep::TokioSleep(sleep)
+    }
+}
+
+#[cfg(any(test, feature = "fuzzing", feature = "testing"))]
+impl From<MockSleep> for Sleep {
+    fn from(sleep: MockSleep) -> Self {
+        Sleep::MockSleep(sleep)
+    }
 }
 
 impl Future for Sleep {
     type Output = ();
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        match self.get_mut() {
-            Sleep::TokioSleep(inner) => Pin::new(inner).poll(cx),
+        match self.project() {
+            SleepProject::TokioSleep(inner) => inner.poll(cx),
             #[cfg(any(test, feature = "fuzzing", feature = "testing"))]
-            Sleep::MockSleep(inner) => Pin::new(inner).poll(cx),
+            SleepProject::MockSleep(inner) => Pin::new(inner).poll(cx),
         }
     }
 }
 
-#[enum_dispatch]
-pub trait SleepTrait: Future<Output = ()> + Send + Sync + Unpin + Debug {
+pub trait SleepTrait: Future<Output = ()> + Send + Sync + Debug {
     /// Returns `true` if this `Sleep`'s requested wait duration has elapsed.
     fn is_elapsed(&self) -> bool;
 
     /// Resets this `Sleep`'s wait duration.
-    fn reset(&mut self, duration: Duration);
+    fn reset(self: Pin<&mut Self>, duration: Duration);
+}
+
+impl SleepTrait for Sleep {
+    fn is_elapsed(&self) -> bool {
+        match self {
+            Sleep::TokioSleep(inner) => inner.is_elapsed(),
+            #[cfg(any(test, feature = "fuzzing", feature = "testing"))]
+            Sleep::MockSleep(inner) => inner.is_elapsed(),
+        }
+    }
+
+    fn reset(self: Pin<&mut Self>, duration: Duration) {
+        match self.project() {
+            SleepProject::TokioSleep(inner) => SleepTrait::reset(inner, duration),
+            #[cfg(any(test, feature = "fuzzing", feature = "testing"))]
+            SleepProject::MockSleep(inner) => Pin::new(inner).reset(duration),
+        }
+    }
 }

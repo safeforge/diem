@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::{Sleep, SleepTrait, TimeServiceTrait};
-use std::time::Duration;
+use std::{pin::Pin, time::Duration};
 
 /// The real production tokio [`TimeService`].
 ///
@@ -11,7 +11,7 @@ use std::time::Duration;
 #[derive(Copy, Clone, Debug, Default)]
 pub struct TokioTimeService;
 
-pub type TokioSleep = tokio::time::Delay;
+pub type TokioSleep = tokio::time::Sleep;
 
 impl TokioTimeService {
     pub fn new() -> Self {
@@ -26,7 +26,7 @@ impl TimeServiceTrait for TokioTimeService {
 
     /// See [`tokio::time::delay_for`]
     fn sleep(&self, duration: Duration) -> Sleep {
-        tokio::time::delay_for(duration).into()
+        tokio::time::sleep(duration).into()
     }
 }
 
@@ -35,7 +35,7 @@ impl SleepTrait for TokioSleep {
         TokioSleep::is_elapsed(self)
     }
 
-    fn reset(&mut self, duration: Duration) {
+    fn reset(self: Pin<&mut Self>, duration: Duration) {
         let deadline = self.deadline() + duration;
         TokioSleep::reset(self, deadline);
     }
