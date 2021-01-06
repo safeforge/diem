@@ -16,7 +16,6 @@ use futures::{
     sink::Sink,
     stream::Stream,
 };
-use netcore::compat::IoCompat;
 use pin_project::pin_project;
 #[cfg(any(test, feature = "fuzzing"))]
 use proptest_derive::Arbitrary;
@@ -27,7 +26,10 @@ use std::{
     task::{Context, Poll},
 };
 use thiserror::Error;
-use tokio_util::codec::{FramedRead, FramedWrite, LengthDelimitedCodec};
+use tokio_util::{
+    codec::{FramedRead, FramedWrite, LengthDelimitedCodec},
+    compat::{Compat, FuturesAsyncReadCompatExt, FuturesAsyncWriteCompatExt},
+};
 
 #[cfg(test)]
 mod test;
@@ -155,13 +157,13 @@ pub fn network_message_frame_codec(max_frame_size: usize) -> LengthDelimitedCode
 #[pin_project]
 pub struct NetworkMessageStream<TReadSocket: AsyncRead> {
     #[pin]
-    framed_read: FramedRead<IoCompat<TReadSocket>, LengthDelimitedCodec>,
+    framed_read: FramedRead<Compat<TReadSocket>, LengthDelimitedCodec>,
 }
 
 impl<TReadSocket: AsyncRead> NetworkMessageStream<TReadSocket> {
     pub fn new(socket: TReadSocket, max_frame_size: usize) -> Self {
         let frame_codec = network_message_frame_codec(max_frame_size);
-        let compat_socket = IoCompat::new(socket);
+        let compat_socket = socket.compat();
         let framed_read = FramedRead::new(compat_socket, frame_codec);
         Self { framed_read }
     }
@@ -200,13 +202,13 @@ impl<TReadSocket: AsyncRead> Stream for NetworkMessageStream<TReadSocket> {
 #[pin_project]
 pub struct NetworkMessageSink<TWriteSocket: AsyncWrite> {
     #[pin]
-    framed_write: FramedWrite<IoCompat<TWriteSocket>, LengthDelimitedCodec>,
+    framed_write: FramedWrite<Compat<TWriteSocket>, LengthDelimitedCodec>,
 }
 
 impl<TWriteSocket: AsyncWrite> NetworkMessageSink<TWriteSocket> {
     pub fn new(socket: TWriteSocket, max_frame_size: usize) -> Self {
         let frame_codec = network_message_frame_codec(max_frame_size);
-        let compat_socket = IoCompat::new(socket);
+        let compat_socket = socket.compat_write();
         let framed_write = FramedWrite::new(compat_socket, frame_codec);
         Self { framed_write }
     }

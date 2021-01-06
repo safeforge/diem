@@ -301,7 +301,7 @@ dependencies = [
  "storage-interface",
  "structopt 0.3.21",
  "tokio 1.0.1",
- "tokio-util 0.3.1",
+ "tokio-util 0.6.0",
  "toml",
 ]
 
@@ -613,6 +613,9 @@ name = "bytes"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ad1f8e949d755f9d79112b5bb46938e0ef9d3804a0b16dfab13aafcaa5f0fa72"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "c_linked_list"
@@ -4540,7 +4543,7 @@ dependencies = [
 name = "netcore"
 version = "0.1.0"
 dependencies = [
- "bytes 0.5.6",
+ "bytes 1.0.0",
  "diem-logger",
  "diem-network-address",
  "diem-types",
@@ -4561,7 +4564,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "bcs",
- "bytes 0.5.6",
+ "bytes 1.0.0",
  "channel",
  "criterion",
  "diem-bitvec",
@@ -4596,7 +4599,8 @@ dependencies = [
  "thiserror",
  "tokio 1.0.1",
  "tokio-retry",
- "tokio-util 0.3.1",
+ "tokio-stream",
+ "tokio-util 0.6.0",
 ]
 
 [[package]]
@@ -6534,7 +6538,7 @@ dependencies = [
  "network-builder",
  "rand 0.7.3",
  "tokio 1.0.1",
- "tokio-util 0.3.1",
+ "tokio-util 0.6.0",
 ]
 
 [[package]]
@@ -7301,7 +7305,6 @@ checksum = "be8242891f2b6cbef26a2d7e8605133c2c554cd35b3e4948ea892d6d68436499"
 dependencies = [
  "bytes 0.5.6",
  "futures-core",
- "futures-io",
  "futures-sink",
  "log",
  "pin-project-lite 0.1.11",

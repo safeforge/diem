@@ -34,10 +34,12 @@ use futures::{
     stream::StreamExt,
     FutureExt, SinkExt, TryFutureExt,
 };
-use netcore::compat::IoCompat;
 use serde::{export::Formatter, Serialize};
 use std::{fmt::Debug, sync::Arc, time::Duration};
 use tokio::runtime::Handle;
+use tokio_util::compat::{
+    FuturesAsyncReadCompatExt, TokioAsyncReadCompatExt, TokioAsyncWriteCompatExt,
+};
 
 #[cfg(test)]
 mod test;
@@ -171,11 +173,11 @@ where
 
         // Split the connection into a ReadHalf and a WriteHalf.
         let (read_socket, write_socket) =
-            tokio::io::split(IoCompat::new(self.connection.take().unwrap()));
+            tokio::io::split(self.connection.take().unwrap().compat());
 
         let mut reader =
-            NetworkMessageStream::new(IoCompat::new(read_socket), self.max_frame_size).fuse();
-        let writer = NetworkMessageSink::new(IoCompat::new(write_socket), self.max_frame_size);
+            NetworkMessageStream::new(read_socket.compat(), self.max_frame_size).fuse();
+        let writer = NetworkMessageSink::new(write_socket.compat_write(), self.max_frame_size);
 
         // Start writer "process" as a separate task. We receive two handles to communicate with
         // the task:

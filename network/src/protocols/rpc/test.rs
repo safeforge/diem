@@ -145,7 +145,7 @@ fn create_network_response(request_id: RequestId, raw_response: Bytes) -> Networ
 fn outbound_rpc_success() {
     ::diem_logger::Logger::init_for_testing();
 
-    let mut rt = Runtime::new().unwrap();
+    let rt = Runtime::new().unwrap();
     let (_network_context, mut rpc_requests_tx, mut peer_reqs_rx, mut peer_notifs_tx) =
         start_rpc_actor(rt.handle().clone());
 
@@ -198,7 +198,7 @@ fn outbound_rpc_success() {
 fn outbound_rpc_concurrent() {
     ::diem_logger::Logger::init_for_testing();
 
-    let mut rt = Runtime::new().unwrap();
+    let rt = Runtime::new().unwrap();
     let (_network_context, mut rpc_requests_tx, mut peer_reqs_rx, mut peer_notifs_tx) =
         start_rpc_actor(rt.handle().clone());
 
@@ -286,7 +286,7 @@ fn outbound_rpc_concurrent() {
 fn outbound_rpc_timeout() {
     ::diem_logger::Logger::init_for_testing();
 
-    let mut rt = Runtime::new().unwrap();
+    let rt = Runtime::new().unwrap();
     let (_network_context, mut rpc_requests_tx, mut peer_reqs_rx, _peer_notifs_tx) =
         start_rpc_actor(rt.handle().clone());
 
@@ -328,7 +328,7 @@ fn outbound_rpc_timeout() {
 fn outbound_cancellation_before_send() {
     ::diem_logger::Logger::init_for_testing();
 
-    let mut rt = Runtime::new().unwrap();
+    let rt = Runtime::new().unwrap();
     let (network_context, mut rpc_requests_tx, _peer_reqs_rx, _peer_notifs_tx) =
         start_rpc_actor(rt.handle().clone());
 
@@ -354,7 +354,7 @@ fn outbound_cancellation_before_send() {
         while counters::rpc_messages(&network_context, REQUEST_LABEL, CANCELED_LABEL).get() as u64
             != 1
         {
-            tokio::time::delay_for(Duration::from_millis(10)).await;
+            tokio::time::sleep(Duration::from_millis(10)).await;
         }
     };
     rt.block_on(f_send_rpc);
@@ -366,7 +366,7 @@ fn outbound_cancellation_before_send() {
 fn outbound_cancellation_before_recv() {
     ::diem_logger::Logger::init_for_testing();
 
-    let mut rt = Runtime::new().unwrap();
+    let rt = Runtime::new().unwrap();
     let (network_context, mut rpc_requests_tx, mut peer_reqs_rx, _peer_notifs_tx) =
         start_rpc_actor(rt.handle().clone());
 
@@ -398,7 +398,7 @@ fn outbound_cancellation_before_recv() {
         while counters::rpc_messages(&network_context, REQUEST_LABEL, CANCELED_LABEL).get() as u64
             != 1
         {
-            tokio::time::delay_for(Duration::from_millis(10)).await;
+            tokio::time::sleep(Duration::from_millis(10)).await;
         }
     };
     rt.block_on(f_send_rpc);
@@ -410,7 +410,7 @@ fn outbound_cancellation_before_recv() {
 fn outbound_rpc_failed_request_delivery() {
     ::diem_logger::Logger::init_for_testing();
 
-    let mut rt = Runtime::new().unwrap();
+    let rt = Runtime::new().unwrap();
     let (_network_context, mut rpc_requests_tx, mut peer_reqs_rx, _peer_notifs_tx) =
         start_rpc_actor(rt.handle().clone());
 
