@@ -4418,7 +4418,6 @@ dependencies = [
  "serde",
  "subscription-service",
  "tokio",
- "tokio-retry",
 ]
 
 [[package]]
