@@ -68,6 +68,7 @@ impl Transport for TcpTransport {
         }
 
         let listener = ::std::net::TcpListener::bind((ipaddr, port))?;
+        listener.set_nonblocking(true)?;
         let listener = TcpListener::try_from(listener)?;
         let listen_addr = NetworkAddress::from(listener.local_addr()?);
 
